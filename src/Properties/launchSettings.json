@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InternetReady": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}
