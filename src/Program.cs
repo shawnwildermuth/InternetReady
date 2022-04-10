@@ -25,6 +25,12 @@ CommandOption<bool> log = app.Option<bool>("-l|--log",
   CommandOptionType.NoValue,
   cfg => cfg.DefaultValue = false);
 
+CommandOption<bool> clearLog = app.Option<bool>("--clear-log",
+  "Clear log file before starting",
+  CommandOptionType.NoValue,
+  cfg => cfg.DefaultValue = false);
+
+
 CommandOption<string> logName = app.Option<string>("-o|--output <FilePath>",
   "Log File Path",
   CommandOptionType.SingleValue, cfg =>
@@ -47,6 +53,12 @@ app.OnExecute(() =>
   
   WriteLine($"Testing Internet Connection Pinging {testDomain.ParsedValue}");
 
+  // Delete Log if log is enabled and have specified clear log
+  if (log.ParsedValue && clearLog.ParsedValue)
+  {
+    File.Delete(Path.Combine(Environment.CurrentDirectory, logName.ParsedValue));
+  }
+
   while (true)
   {
     try
@@ -62,6 +74,12 @@ app.OnExecute(() =>
           LogIfNecessary(message);
           WriteLine();
           WriteLine(message);
+          Beep();
+          Thread.Sleep(50);
+          Beep();
+          Thread.Sleep(50);
+          Beep();
+          Thread.Sleep(50);
           return 0;
         }
       }
@@ -93,10 +111,9 @@ return app.Execute(args);
 
 void LogIfNecessary(string message)
 {
-  var filePath = logName.ParsedValue;
-  if (log.HasValue() && !string.IsNullOrWhiteSpace(filePath))
+  if (log.ParsedValue && !string.IsNullOrWhiteSpace(logName.ParsedValue))
   {
-    var path = Path.Combine(Environment.CurrentDirectory, filePath);
+    var path = Path.Combine(Environment.CurrentDirectory, logName.ParsedValue);
     File.AppendAllText(path, message);
   }
 }
